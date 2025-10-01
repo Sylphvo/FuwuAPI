@@ -1,17 +1,25 @@
 using Microsoft.EntityFrameworkCore;
 using WebApi.Entities;
+using WebApi.Models;
 
 namespace WebApi.Data;
 
-public sealed class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class AppDbContext : DbContext
 {
-    public DbSet<Todo> Todos => Set<Todo>();
-    protected override void OnModelCreating(ModelBuilder b)
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
-        b.Entity<Todo>(e =>
+    }
+
+    public DbSet<User> Users { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<User>(entity =>
         {
-            e.HasKey(x => x.Id);
-            e.Property(x => x.Title).HasMaxLength(200).IsRequired();
+            entity.HasIndex(e => e.Username).IsUnique();
+            entity.HasIndex(e => e.Email).IsUnique();
         });
     }
 }
